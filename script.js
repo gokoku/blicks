@@ -42,6 +42,8 @@ const ball = {
       ) {
         ball.yd *= -1
         ball.changeSpeed()
+        paddle.short()
+        console.log(paddle.width)
       } else {
         display.lives -= 1
         if (display.lives == 0) {
@@ -66,6 +68,11 @@ const paddle = {
     paddle.x = (canvas.width - paddle.width) / 2
     paddle.right = false
     paddle.left = false
+  },
+  short: () => {
+    if (paddle.width > 35) {
+      paddle.width -= 5
+    }
   },
   update: () => {
     ctx.beginPath()
@@ -128,7 +135,6 @@ const bricks = {
     blocks.forEach((row) => {
       row.forEach((col) => {
         if (col.status == 1) {
-          console.log(col)
           if (
             ball.x > col.x &&
             ball.x < col.x + bricks.width &&
