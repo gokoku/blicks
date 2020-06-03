@@ -1,7 +1,8 @@
 const canvas = document.querySelector('#myCanvas')
 const ctx = canvas.getContext('2d')
 const color = ['#548C00', '#61995E', '#619988', '#5D871E', '#5D871E']
-const speed = [3, 1, 4, 2]
+const ballColor = ['#00000', '#CA2D3A', '#BE5F00', '#0786E6']
+const speed = [5, 1, 3, 2]
 let gameRun = false
 let blocks = []
 
@@ -22,7 +23,7 @@ const ball = {
   update: () => {
     ctx.beginPath()
     ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2)
-    ctx.fillStyle = color[4]
+    ctx.fillStyle = ballColor[display.lives]
     ctx.fill()
     ctx.closePath()
 
@@ -43,19 +44,16 @@ const ball = {
         ball.yd *= -1
         ball.changeSpeed()
         paddle.short()
-        console.log(paddle.width)
       } else {
         display.lives -= 1
         if (display.lives == 0) {
           gameRun = false
-
           display.message('Game Over')
         } else {
           ball.init()
         }
       }
     }
-
     ball.x += ball.dx * ball.xd
     ball.y += ball.dy * ball.yd
   },
@@ -82,10 +80,9 @@ const paddle = {
       paddle.width,
       paddle.height
     )
-    ctx.fillStyle = color[3]
+    ctx.fillStyle = ballColor[display.lives]
     ctx.fill()
     ctx.closePath()
-
     if (paddle.right && paddle.x < canvas.width - paddle.width) {
       paddle.x += 7
     } else if (paddle.left && paddle.x > 0) {
@@ -173,6 +170,11 @@ const display = {
     ctx.font = '16px Arial'
     ctx.fillStyle = 'white'
     ctx.fillText('Lives: ' + display.lives, canvas.width - 65, 16)
+
+    ctx.beginPath()
+    ctx.fillStyle = ballColor[display.lives]
+    ctx.fillRect(canvas.width - 85, 3, 15, 12)
+    ctx.closePath()
   },
   message: (text) => {
     ctx.beginPath()
@@ -183,6 +185,14 @@ const display = {
     ctx.font = '50px Arial'
     ctx.fillStyle = 'white'
     ctx.fillText(text, canvas.width / 4, canvas.height / 2)
+
+    ctx.font = '20px Arial'
+    ctx.fillStyle = 'white'
+    ctx.fillText(
+      'push the space key',
+      canvas.width / 3,
+      (canvas.height * 2) / 3
+    )
   },
 }
 
