@@ -1,16 +1,24 @@
 const canvas = document.querySelector('#myCanvas')
 const ctx = canvas.getContext('2d')
 const color = ['#548C00', '#61995E', '#619988', '#5D871E', '#5D871E']
+const speed = [3, 1, 4, 2]
 let gameRun = false
+let blocks = []
 
 const ball = {
-  radius: 10,
-  x: canvas.width / 2,
-  y: canvas.height - 30,
-  dx: 2,
-  dy: 2,
-  xd: 1,
-  yd: -1,
+  init: () => {
+    ball.radius = 10
+    ball.x = canvas.width / 2
+    ball.y = canvas.height - 30
+    ball.dx = speed[0]
+    ball.dy = speed[0]
+    ball.xd = 1
+    ball.yd = -1
+  },
+  changeSpeed: () => {
+    ball.dx = speed[Math.floor(Math.random() * 4)]
+    ball.yx = speed[Math.floor(Math.random() * 4)]
+  },
   update: () => {
     ctx.beginPath()
     ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2)
@@ -33,6 +41,7 @@ const ball = {
         ball.x < paddle.x + paddle.width + ball.radius
       ) {
         ball.yd *= -1
+        ball.changeSpeed()
       } else {
         display.lives -= 1
         if (display.lives == 0) {
@@ -40,13 +49,7 @@ const ball = {
 
           display.message('Game Over')
         } else {
-          ball.x = canvas.width / 2
-          ball.y = canvas.height - 30
-          ball.dx = 2
-          ball.dy = 2
-          ball.xd = 1
-          ball.yd = -1
-          paddle.x = (canvas.width - paddle.width) / 2
+          ball.init()
         }
       }
     }
@@ -57,11 +60,13 @@ const ball = {
 }
 
 const paddle = {
-  height: 10,
-  width: 75,
-  x: (canvas.width - 75) / 2,
-  right: false,
-  left: false,
+  init: () => {
+    paddle.width = 75
+    paddle.height = 10
+    paddle.x = (canvas.width - paddle.width) / 2
+    paddle.right = false
+    paddle.left = false
+  },
   update: () => {
     ctx.beginPath()
     ctx.rect(
@@ -83,15 +88,22 @@ const paddle = {
 }
 
 const bricks = {
-  rowCount: 3,
-  columnCount: 5,
-  width: 75,
-  height: 20,
-  padding: 10,
-  offsetTop: 30,
-  offsetLeft: 30,
-  brokenNumber: 0,
-
+  init: () => {
+    bricks.rowCount = 3
+    bricks.columnCount = 5
+    bricks.width = 75
+    bricks.height = 20
+    bricks.padding = 10
+    bricks.offsetTop = 30
+    bricks.offsetLeft = 30
+    bricks.brokenNumber = 0
+    for (let r = 0; r < bricks.rowCount; r++) {
+      blocks[r] = []
+      for (let c = 0; c < bricks.columnCount; c++) {
+        blocks[r][c] = { x: 0, y: 0, status: 1 }
+      }
+    }
+  },
   update: () => {
     let r = 0
     blocks.forEach((row, r) => {
@@ -127,6 +139,7 @@ const bricks = {
             col.status = 0
             display.point += 1
             bricks.brokenNumber += 1
+            ball.changeSpeed()
             if (bricks.brokenNumber == bricks.rowCount * bricks.columnCount) {
               gameRun = false
               display.message('YOU WIN!!')
@@ -136,14 +149,6 @@ const bricks = {
       })
     })
   },
-}
-
-let blocks = []
-for (let r = 0; r < bricks.rowCount; r++) {
-  blocks[r] = []
-  for (let c = 0; c < bricks.columnCount; c++) {
-    blocks[r][c] = { x: 0, y: 0, status: 1 }
-  }
 }
 
 const display = {
@@ -219,5 +224,9 @@ function draw() {
     requestAnimationFrame(draw)
   }
 }
+
 gameRun = true
+bricks.init()
+ball.init()
+paddle.init()
 draw()
